@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- store-kit style "lifted-cards" — Play feature graphic 1024x500.
+     Wordmark (./wordmark.svg), headline with the marked second line, sub, the hero screen in a tilted phone; RTL mirrors.
+     Params: ?l1 ?l2 ?sub ?img ?lang ?dir. Per app, edit only fonts, colours and FONT_FOR (same as template.html). -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Jakarta'; font-weight: 200 800; src: url(fonts/PlusJakartaSans.ttf); }
+  @font-face { font-family: 'Manrope'; font-weight: 200 800; src: url(fonts/Manrope.ttf); }
+  @font-face { font-family: 'Plex Arabic'; font-weight: 700; src: url(fonts/IBMPlexSansArabic-Bold.ttf); }
+  @font-face { font-family: 'Plex Arabic'; font-weight: 500; src: url(fonts/IBMPlexSansArabic-Medium.ttf); }
+  html, body { margin: 0; width: 1024px; height: 500px; overflow: hidden; background: #F4F1EA; }
+  body { position: relative; font-family: var(--font); }
+  #text { position: absolute; top: 74px; width: 560px; }
+  [dir=ltr] #text { left: 64px; } [dir=rtl] #text { right: 64px; text-align: right; }
+  #word { height: 40px; display: block; }
+  [dir=rtl] #word { margin-left: auto; }
+  h1 { margin: 34px 0 0; font-weight: 800; font-size: 54px; line-height: 1.18; letter-spacing: -0.02em; color: #17191C; }
+  h1 span { display: inline-block; white-space: nowrap; }
+  h1 .mark { color: #0C4F59; background: #BEE8EB; border-radius: 8px; padding: 0 10px; margin-top: 4px; }
+  p { margin: 22px 0 0; font-size: 21px; font-weight: 500; color: #61646B; }
+  .phone { position: absolute; top: 46px; width: 290px; padding: 8px; border-radius: 40px; background: #101315; box-shadow: 0 30px 70px rgba(20, 24, 26, 0.22); }
+  [dir=ltr] .phone { right: 70px; transform: rotate(4deg); } [dir=rtl] .phone { left: 70px; transform: rotate(-4deg); }
+  .phone img { display: block; width: 100%; border-radius: 32px; }
+</style>
+</head>
+<body>
+<div id="text"><img id="word" src="wordmark.svg" alt=""><h1><span></span><br><span class="mark"></span></h1><p></p></div>
+<div class="phone"><img alt=""></div>
+<script>
+  const q = new URLSearchParams(location.search), lang = q.get('lang') || 'en';
+  document.body.dir = q.get('dir') || 'ltr';
+  // ── BRAND: font per language (same as template.html)
+  const FONT_FOR = (l) => (['ar', 'fa'].includes(l) ? "'Plex Arabic'" : ['uk', 'ru'].includes(l) ? "'Manrope'" : "'Jakarta'");
+  document.documentElement.style.setProperty('--font', FONT_FOR(lang));
+  const s = document.querySelectorAll('h1 span'); s[0].textContent = q.get('l1') || ''; s[1].textContent = q.get('l2') || '';
+  document.querySelector('p').textContent = q.get('sub') || '';
+  if (q.get('img')) document.querySelector('.phone img').src = q.get('img');
+  function fit() { const h = document.querySelector('h1'); let z = 54; while ([...s].some((x) => x.offsetWidth > 560) && z > 34) h.style.fontSize = (z -= 2) + 'px'; }
+  fit();
+</script>
+</body>
+</html>

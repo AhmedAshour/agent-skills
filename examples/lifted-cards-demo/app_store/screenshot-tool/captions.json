@@ -1,0 +1,31 @@
+{
+  "screens": [
+    { "screen": "today", "theme": "paper" },
+    { "screen": "progress", "theme": "ink" },
+    { "screen": "add", "theme": "paper" }
+  ],
+  "featureGraphic": {
+    "screen": "today",
+    "en-US": { "caption": "Small habits.\nEvery day.", "sub": "A calm habit tracker", "l1": "Small habits.", "l2": "Every day." },
+    "de-DE": { "caption": "Kleine Schritte.\nJeden Tag.", "sub": "Gewohnheiten, ganz ruhig", "l1": "Kleine Schritte.", "l2": "Jeden Tag." },
+    "ar-SA": { "caption": "عادات صغيرة.\nكل يوم.", "sub": "متتبع عادات هادئ", "l1": "عادات صغيرة.", "l2": "كل يوم." }
+  },
+  "locales": {
+    "en-US": {
+      "today":    { "caption": "Your day,\nat a glance", "sub": "Every habit due today in one list" },
+      "progress": { "caption": "Watch it\nadd up", "sub": "Streaks and weekly totals" },
+      "add":      { "caption": "Start in\none tap", "sub": "Pick a habit, set a time, done" }
+    },
+    "de-DE": {
+      "today":    { "caption": "Dein Tag\nauf einen Blick", "sub": "Alle Gewohnheiten für heute in einer Liste" },
+      "progress": { "caption": "Sieh, wie es\nwächst", "sub": "Serien und Wochenwerte" },
+      "add":      { "caption": "Mit einem\nTipp starten", "sub": "Gewohnheit wählen, Zeit setzen, fertig" }
+    },
+    "ar-SA": {
+      "_dir": "rtl", "_lang": "ar",
+      "today":    { "caption": "يومك\nبنظرة واحدة", "sub": "كل عادات اليوم في قائمة واحدة" },
+      "progress": { "caption": "شاهد تقدمك\nيكبر", "sub": "أيام متتالية ومجموع أسبوعي" },
+      "add":      { "caption": "ابدأ\nبلمسة واحدة", "sub": "اختر عادة وحدد وقتًا، وانتهى" }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "package": "com.example.steady",
+  "icon": "app_store/icon.png",
+  "rawDir": "app_store/raw",
+  "play": {
+    "locales": [
+      { "play": "en-US", "text": "en-US", "images": "en-US" },
+      { "play": "de-DE", "text": "de-DE", "images": "de-DE" },
+      { "play": "ar", "text": "ar", "images": "ar-SA" }
+    ],
+    "details": { "defaultLanguage": "en-US", "contactWebsite": "https://example.com", "contactEmail": "support@example.com" }
+  },
+  "apple": {
+    "appId": "1234567890",
+    "target": "ios-6.9",
+    "displayType": "APP_IPHONE_67",
+    "locales": { "en-US": "en-US", "en-GB": "en-US", "de-DE": "de-DE", "ar-SA": "ar-SA" },
+    "urls": { "privacy": "https://example.com/privacy", "support": "https://example.com/support", "marketing": "https://example.com" }
+  }
+}

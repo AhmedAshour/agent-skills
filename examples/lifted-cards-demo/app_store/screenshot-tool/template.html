@@ -1,0 +1,105 @@
+<!doctype html>
+<!-- store-kit style "lifted-cards".
+     Paper ground, a short outcome headline whose second line sits on a marker, the real screen in a tilted
+     phone, and the one or two cards that matter lifted out of it, bigger.
+     Params from render.mjs: ?caption (line1\nline2 — line 2 is marked) ?sub ?screen ?img ?cw ?ch ?lang ?dir
+     Cards + tilt: lift.js, written by prep-raw.py from lift.json.
+     Per app, edit only the BRAND block (fonts in ./fonts, colours, which font each language uses). -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Jakarta'; font-weight: 200 800; src: url(fonts/PlusJakartaSans.ttf); }
+  @font-face { font-family: 'Manrope'; font-weight: 200 800; src: url(fonts/Manrope.ttf); }
+  @font-face { font-family: 'Plex Arabic'; font-weight: 700; src: url(fonts/IBMPlexSansArabic-Bold.ttf); }
+  @font-face { font-family: 'Plex Arabic'; font-weight: 500; src: url(fonts/IBMPlexSansArabic-Medium.ttf); }
+  /* ── BRAND ── ground, headline ink, marked line (text + marker), sub, phone bezel */
+  :root { --paper: #F4F1EA; --ink: #17191C; --petrol: #0C4F59; --mark: #BEE8EB; --muted: #61646B; --bezel: #101315; }
+  html, body { margin: 0; overflow: hidden; background: var(--paper); }
+  body { position: relative; font-family: var(--font); }
+  #text { position: absolute; left: 0; right: 0; text-align: center; }
+  h1 { margin: 0; font-weight: 800; color: var(--ink); line-height: 1.16; letter-spacing: -0.02em; }
+  h1 span { display: inline-block; width: max-content; white-space: nowrap; }
+  h1 .mark { color: var(--petrol); background: var(--mark); border-radius: 0.14em; padding: 0 0.16em; margin-top: 0.06em; }
+  p { margin: 0.55em 0 0; font-weight: 500; color: var(--muted); }
+  .phone { position: absolute; background: var(--bezel); box-shadow: 0 40px 90px rgba(20, 24, 26, 0.22); }
+  .phone img { display: block; width: 100%; }
+  .card { position: absolute; background-repeat: no-repeat; box-shadow: 0 34px 80px rgba(20, 24, 26, 0.26), 0 4px 14px rgba(20, 24, 26, 0.10); }
+</style>
+<script src="lift.js"></script>
+</head>
+<body>
+<img id="raw" alt="" style="display:none">
+<div id="text"><h1></h1><p></p></div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const cw = +q.get('cw') || 1320, ch = +q.get('ch') || 2868, lang = q.get('lang') || 'en', screen = q.get('screen');
+  // ── BRAND: headline/sub font per language (families declared in @font-face above)
+  const FONT_FOR = (l) => (['ar', 'fa'].includes(l) ? "'Plex Arabic'" : ['uk', 'ru'].includes(l) ? "'Manrope'" : "'Jakarta'");
+  const raw = document.getElementById('raw'); if (q.get('img')) raw.src = q.get('img');  // render.mjs waits for it
+  document.body.style.width = cw + 'px'; document.body.style.height = ch + 'px';
+  document.documentElement.style.setProperty('--font', FONT_FOR(lang));
+  const text = document.getElementById('text'); text.dir = q.get('dir') || 'ltr';
+  const [l1, l2] = (q.get('caption') || '').split('\n');
+  const h1 = text.querySelector('h1');
+  h1.innerHTML = `<span></span><br><span class="mark"></span>`;
+  h1.children[0].textContent = l1 || ''; h1.children[2].textContent = l2 || '';
+  text.querySelector('p').textContent = q.get('sub') || '';
+
+  // tilt side alternates by screen order (0 = straight phone, no cards); cards come from the raw set this locale uses
+  const LIFT = window.LIFT || { sets: {}, langSet: {}, side: {}, focus: {} };
+  const SIDE = LIFT.side[screen] ?? 1;
+  const set = LIFT.langSet[lang] || Object.keys(LIFT.sets)[0];
+  const focus = LIFT.focus[set]?.[screen] || [];
+
+  function fit() {
+    const pad = cw * 0.07;
+    text.style.top = ch * 0.045 + 'px';
+    text.style.padding = `0 ${pad}px`;
+    let size = cw * 0.096;
+    h1.style.fontSize = size + 'px';
+    while ([...h1.querySelectorAll('span')].some((s) => s.offsetWidth > cw - 2 * pad) && size > cw * 0.05) {
+      size -= 2; h1.style.fontSize = size + 'px';
+    }
+    const p = text.querySelector('p'); let ps = cw * 0.036; p.style.fontSize = ps + 'px';
+    while (p.scrollWidth > cw - 2 * pad && ps > cw * 0.026) { ps -= 1; p.style.fontSize = ps + 'px'; }
+  }
+  function fitDevice() {
+    document.querySelectorAll('.phone, .card').forEach((n) => n.remove());
+    const img = q.get('img'); if (!img) return;
+    const RAW_W = raw.naturalWidth || 1206, RAW_H = raw.naturalHeight || 2622;
+    const textBottom = text.offsetTop + text.offsetHeight;
+    const pw = cw * (SIDE ? 0.74 : 0.76), ph = pw * RAW_H / RAW_W, bez = pw * 0.026;
+    const px = (cw - pw) / 2 + SIDE * cw * 0.07 - bez, py = textBottom + ch * 0.035;
+    const phone = document.createElement('div'); phone.className = 'phone';
+    Object.assign(phone.style, { left: px + 'px', top: py + 'px', width: pw + 'px', padding: bez + 'px', borderRadius: pw * 0.135 + 'px', transform: `rotate(${SIDE * 3.5}deg)` });
+    phone.innerHTML = `<img src="${img}" style="border-radius:${pw * 0.11}px">`;
+    document.body.appendChild(phone);
+    // lift each card out of the screen at its own height, bigger than the phone shows it
+    const k = pw / RAW_W; let floor = ch - cw * 0.05;
+    const cards = focus.map(([x, y, w, h], i) => {
+      const s = cw * 0.86 / (RAW_W * 0.88);  // same zoom for every card: a full-width app card fills 86% of the frame
+      const W = w * s, H = h * s;
+      const centerY = py + bez + (y + h / 2) * k;
+      return { x, y, w, h, s, W, H, top: centerY - H / 2, i };
+    });
+    // keep cards on canvas and apart: push down past the previous one, then pull everything up if the last overflows
+    for (let i = 1; i < cards.length; i++) cards[i].top = Math.max(cards[i].top, cards[i - 1].top + cards[i - 1].H + cw * 0.03);
+    const over = cards.length ? cards[cards.length - 1].top + cards[cards.length - 1].H - floor : 0;
+    if (over > 0) cards.forEach((c) => (c.top -= over));
+    for (const c of cards) {
+      const el = document.createElement('div'); el.className = 'card';
+      const left = (cw - c.W) / 2 - SIDE * cw * 0.015 + (c.w < RAW_W * 0.83 ? -SIDE * cw * 0.03 : 0);
+      Object.assign(el.style, {
+        left: left + 'px', top: c.top + 'px', width: c.W + 'px', height: c.H + 'px',
+        backgroundImage: `url("${img}")`, backgroundSize: `${RAW_W * c.s}px ${RAW_H * c.s}px`,
+        backgroundPosition: `${-c.x * c.s}px ${-c.y * c.s}px`, borderRadius: RAW_W * 0.055 * c.s + 'px',
+        transform: `rotate(${(c.i % 2 ? 1 : -1) * SIDE * 1.6}deg)`,
+      });
+      document.body.appendChild(el);
+    }
+  }
+  fit(); fitDevice();
+</script>
+</body>
+</html>

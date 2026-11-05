@@ -1,0 +1,88 @@
+<!doctype html>
+<!-- store-kit style "caption-phone": two-line headline + one-line sub on a tinted ground, the real screen in a phone.
+     Params from render.mjs: ?caption (line1\nline2) ?sub ?screen ?img ?cw ?ch ?tablet=1 ?theme (paper|ink) ?dir ?lang
+     ?feature=1 (Play feature graphic 1024x500 when there is no feature.html).
+     Per app, edit only the BRAND block: fonts in ./fonts, colours, which font each language uses. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Jakarta'; font-weight: 200 800; src: url(fonts/PlusJakartaSans.ttf); }
+  @font-face { font-family: 'Manrope'; font-weight: 200 800; src: url(fonts/Manrope.ttf); }
+  @font-face { font-family: 'Plex Arabic'; font-weight: 700; src: url(fonts/IBMPlexSansArabic-Bold.ttf); }
+  @font-face { font-family: 'Plex Arabic'; font-weight: 500; src: url(fonts/IBMPlexSansArabic-Medium.ttf); }
+
+  /* ── BRAND ── one block per theme */
+  body.paper { --bg: #F3EFE6; --glow: #FFFFFF; --ink: #1B1D21; --accent: #C2502E; --sub: #5E6168; --bezel: #15171A; }
+  body.ink   { --bg: #1C2230; --glow: #2D3650; --ink: #FFFFFF; --accent: #F2B880; --sub: #B8BDC9; --bezel: #000000; }
+
+  html, body { margin: 0; overflow: hidden; }
+  body { position: relative; font-family: var(--font); background:
+    radial-gradient(110% 60% at 50% 0%, var(--glow) 0%, transparent 70%), var(--bg); }
+  #text { position: absolute; left: 0; right: 0; text-align: center; }
+  h1 { margin: 0; font-weight: 800; color: var(--ink); line-height: 1.1; letter-spacing: -0.025em; }
+  h1 .l2 { color: var(--accent); }
+  p { margin: 0.6em 0 0; font-weight: 500; color: var(--sub); line-height: 1.3; }
+  .phone { position: absolute; background: var(--bezel); box-shadow: 0 50px 110px rgba(10, 12, 16, 0.28); }
+  .phone img { display: block; width: 100%; }
+  .feature #text { text-align: start; }
+</style>
+</head>
+<body>
+<div id="text"><h1><span class="l1"></span><br><span class="l2"></span></h1><p></p></div>
+<div class="phone"><img alt=""></div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const feature = q.get('feature') === '1', tablet = q.get('tablet') === '1';
+  const cw = +q.get('cw') || 1320, ch = +q.get('ch') || 2868, lang = q.get('lang') || 'en';
+  // ── BRAND: font per language (families declared in @font-face above)
+  const FONT_FOR = (l) => (['ar', 'fa', 'ur'].includes(l) ? "'Plex Arabic'" : ['uk', 'ru', 'bg', 'sr'].includes(l) ? "'Manrope'" : "'Jakarta'");
+
+  document.body.className = (q.get('theme') === 'ink' ? 'ink' : 'paper') + (feature ? ' feature' : '');
+  document.body.style.width = cw + 'px'; document.body.style.height = ch + 'px';
+  document.body.dir = q.get('dir') || 'ltr';
+  document.documentElement.style.setProperty('--font', FONT_FOR(lang));
+  const [l1, l2] = (q.get('caption') || '').split('\n');
+  document.querySelector('.l1').textContent = l1 || '';
+  document.querySelector('.l2').textContent = l2 || '';
+  document.querySelector('p').textContent = q.get('sub') || '';
+  const img = document.querySelector('.phone img');
+  if (q.get('img')) img.src = q.get('img');
+
+  const text = document.getElementById('text'), h1 = text.querySelector('h1'), p = text.querySelector('p');
+  const phone = document.querySelector('.phone');
+
+  // Shrink the headline until both lines fit (long languages), never below 70%.
+  function shrink(base, maxW) {
+    let size = base;
+    h1.style.fontSize = size + 'px';
+    while ([...h1.children].some((s) => s.tagName === 'SPAN' && s.offsetWidth > maxW) && size > base * 0.7) h1.style.fontSize = (size -= 2) + 'px';
+  }
+
+  function fit() {
+    if (feature) {                       // 1024x500: text on the start side, phone on the end side
+      const rtl = document.body.dir === 'rtl';
+      text.style.cssText = `top:${ch * 0.2}px;width:${cw * 0.52}px;${rtl ? 'right' : 'left'}:${cw * 0.07}px`;
+      h1.querySelectorAll('span').forEach((s) => { s.style.whiteSpace = 'nowrap'; s.style.display = 'inline-block'; });
+      shrink(cw * 0.058, cw * 0.52);
+      p.style.fontSize = cw * 0.022 + 'px';
+      const pw = cw * 0.25, pad = pw * 0.035;
+      phone.style.cssText = `width:${pw}px;padding:${pad}px;border-radius:${pw * 0.14}px;top:${ch * 0.1}px;${rtl ? 'left' : 'right'}:${cw * 0.08}px;transform:rotate(${rtl ? -5 : 5}deg)`;
+      img.style.borderRadius = pw * 0.115 + 'px';
+      return;
+    }
+    const pad = cw * 0.07;
+    text.style.top = ch * 0.05 + 'px';
+    text.style.padding = `0 ${pad}px`;
+    h1.querySelectorAll('span').forEach((s) => { s.style.whiteSpace = 'nowrap'; s.style.display = 'inline-block'; });
+    shrink(cw * (tablet ? 0.07 : 0.095), cw - pad * 2);
+    p.style.fontSize = cw * (tablet ? 0.03 : 0.04) + 'px';
+    const pw = cw * (tablet ? 0.6 : 0.8), bez = pw * 0.03;
+    const top = text.offsetTop + text.offsetHeight + ch * 0.04;
+    phone.style.cssText = `width:${pw}px;padding:${bez}px;border-radius:${pw * 0.13}px;left:${(cw - pw) / 2 - bez}px;top:${top}px`;
+    img.style.borderRadius = pw * 0.105 + 'px';
+  }
+  fit();
+</script>
+</body>
+</html>

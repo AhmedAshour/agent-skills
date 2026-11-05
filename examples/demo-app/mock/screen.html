@@ -1,0 +1,88 @@
+<!doctype html>
+<!-- Fake app screens for the demo ("Steady", a made-up habit tracker). make-raws.mjs renders ?screen=&lang= at 1320x2868. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Jakarta'; font-weight: 200 800; src: url(../../../skills/store-screenshots/styles/fonts/PlusJakartaSans.ttf); }
+  @font-face { font-family: 'Plex Arabic'; font-weight: 500; src: url(../../../skills/store-screenshots/styles/fonts/IBMPlexSansArabic-Medium.ttf); }
+  @font-face { font-family: 'Plex Arabic'; font-weight: 700; src: url(../../../skills/store-screenshots/styles/fonts/IBMPlexSansArabic-Bold.ttf); }
+  :root { --bg: #FAF8F4; --card: #FFFFFF; --ink: #1B1D21; --muted: #80838A; --accent: #C2502E; --soft: #F6E3DA; --ok: #3E8E5E; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 440px; height: 956px; overflow: hidden; background: var(--bg); color: var(--ink); }
+  body { font-family: var(--font); zoom: 1; }
+  .status { height: 54px; display: flex; justify-content: space-between; align-items: center; padding: 14px 32px 0; font-weight: 700; font-size: 17px; direction: ltr; }
+  .status i { display: inline-block; width: 26px; height: 12px; border: 2px solid var(--ink); border-radius: 4px; position: relative; }
+  .status i::after { content: ''; position: absolute; inset: 1px; background: var(--ink); border-radius: 1px; }
+  main { padding: 18px 22px 0; }
+  .date { color: var(--muted); font-weight: 600; font-size: 15px; }
+  h1 { margin: 4px 0 18px; font-size: 32px; font-weight: 800; letter-spacing: -0.02em; }
+  .ring { background: var(--card); border-radius: 26px; padding: 22px; display: flex; gap: 20px; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+  .ring svg { flex: none; }
+  .ring b { font-size: 26px; display: block; } .ring span { color: var(--muted); font-size: 15px; }
+  .list { margin-top: 18px; display: grid; gap: 12px; }
+  .row { background: var(--card); border-radius: 20px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+  .ico { width: 44px; height: 44px; border-radius: 14px; background: var(--soft); display: grid; place-items: center; font-size: 22px; }
+  .row .t { flex: 1; } .row .t b { display: block; font-size: 17px; } .row .t span { color: var(--muted); font-size: 14px; }
+  .chk { width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid #D9D5CD; }
+  .chk.on { background: var(--ok); border-color: var(--ok); position: relative; }
+  .chk.on::after { content: ''; position: absolute; left: 9px; top: 4px; width: 7px; height: 13px; border: solid #fff; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+  .streak { margin-top: 18px; background: var(--ink); color: #fff; border-radius: 22px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .streak b { font-size: 22px; } .streak span { opacity: .7; font-size: 14px; display: block; }
+  .bars { background: var(--card); border-radius: 26px; padding: 22px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+  .bars .g { display: flex; align-items: flex-end; gap: 12px; height: 220px; margin-top: 14px; }
+  .bars .g div { flex: 1; background: var(--soft); border-radius: 10px 10px 4px 4px; }
+  .bars .g div.on { background: var(--accent); }
+  .bars .x { display: flex; gap: 12px; margin-top: 8px; color: var(--muted); font-size: 13px; text-align: center; } .bars .x span { flex: 1; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .stat { background: var(--card); border-radius: 20px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+  .stat b { font-size: 30px; display: block; } .stat span { color: var(--muted); font-size: 14px; }
+  .tabs { position: absolute; bottom: 0; left: 0; right: 0; height: 92px; background: #fff; border-top: 1px solid #EEE; display: flex; justify-content: space-around; padding-top: 12px; color: var(--muted); font-size: 12px; font-weight: 600; }
+  .tabs div { text-align: center; } .tabs .on { color: var(--accent); } .tabs i { display: block; width: 26px; height: 26px; margin: 0 auto 4px; border-radius: 8px; background: currentColor; opacity: .85; }
+  .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .preset { background: var(--card); border-radius: 22px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.04); border: 2px solid transparent; }
+  .preset.on { border-color: var(--accent); } .preset .ico { margin-bottom: 12px; } .preset b { font-size: 17px; display: block; } .preset span { color: var(--muted); font-size: 13px; }
+  .btn { margin-top: 18px; background: var(--accent); color: #fff; border-radius: 18px; padding: 18px; text-align: center; font-weight: 700; font-size: 17px; }
+</style>
+</head>
+<body>
+<div class="status"><span>9:41</span><i></i></div>
+<main id="m"></main>
+<div class="tabs" id="tabs"></div>
+<script>
+const q = new URLSearchParams(location.search), lang = q.get('lang') || 'en', screen = q.get('screen') || 'today';
+const T = {
+  en: { date: 'Thursday, 5 June', today: 'Today', done: '3 of 5 done', keep: 'Keep going', habits: [['💧','Drink water','6 of 8 glasses',1],['📖','Read 10 pages','Evening',1],['🏃','Walk 20 min','Morning',1],['🧘','Stretch','5 min',0],['📵','No phone in bed','Night',0]],
+        streak: '12-day streak', best: 'Best: 21 days', progress: 'Progress', week: 'This week', days: ['M','T','W','T','F','S','S'], s1: ['86%','completion'], s2: ['142','habits done'], s3: ['12','day streak'], s4: ['4.3','per day'],
+        add: 'New habit', pick: 'Pick one to start', presets: [['💧','Water','8 glasses'],['📖','Reading','10 pages'],['🏃','Walk','20 minutes'],['🧘','Stretch','5 minutes'],['😴','Sleep','Before 23:00'],['✍️','Journal','3 lines']], cta: 'Add habit', tabs: ['Today','Progress','Add','Settings'] },
+  de: { date: 'Donnerstag, 5. Juni', today: 'Heute', done: '3 von 5 erledigt', keep: 'Weiter so', habits: [['💧','Wasser trinken','6 von 8 Gläsern',1],['📖','10 Seiten lesen','Abends',1],['🏃','20 Min. gehen','Morgens',1],['🧘','Dehnen','5 Min.',0],['📵','Kein Handy im Bett','Nachts',0]],
+        streak: '12 Tage am Stück', best: 'Rekord: 21 Tage', progress: 'Fortschritt', week: 'Diese Woche', days: ['M','D','M','D','F','S','S'], s1: ['86 %','erledigt'], s2: ['142','Gewohnheiten'], s3: ['12','Tage Serie'], s4: ['4,3','pro Tag'],
+        add: 'Neue Gewohnheit', pick: 'Wähle eine zum Start', presets: [['💧','Wasser','8 Gläser'],['📖','Lesen','10 Seiten'],['🏃','Gehen','20 Minuten'],['🧘','Dehnen','5 Minuten'],['😴','Schlaf','Vor 23:00'],['✍️','Tagebuch','3 Zeilen']], cta: 'Hinzufügen', tabs: ['Heute','Fortschritt','Neu','Einstellungen'] },
+  ar: { date: 'الخميس، ٥ يونيو', today: 'اليوم', done: '٣ من ٥ تمت', keep: 'استمر', habits: [['💧','اشرب الماء','٦ من ٨ أكواب',1],['📖','اقرأ ١٠ صفحات','مساءً',1],['🏃','امشِ ٢٠ دقيقة','صباحًا',1],['🧘','تمدد','٥ دقائق',0],['📵','بلا هاتف في السرير','ليلًا',0]],
+        streak: '١٢ يومًا متتاليًا', best: 'الأفضل: ٢١ يومًا', progress: 'التقدم', week: 'هذا الأسبوع', days: ['ن','ث','ر','خ','ج','س','ح'], s1: ['٨٦٪','إنجاز'], s2: ['١٤٢','عادة منجزة'], s3: ['١٢','يومًا متتاليًا'], s4: ['٤٫٣','في اليوم'],
+        add: 'عادة جديدة', pick: 'اختر واحدة للبدء', presets: [['💧','الماء','٨ أكواب'],['📖','القراءة','١٠ صفحات'],['🏃','المشي','٢٠ دقيقة'],['🧘','التمدد','٥ دقائق'],['😴','النوم','قبل ١١ مساءً'],['✍️','اليوميات','٣ أسطر']], cta: 'أضف العادة', tabs: ['اليوم','التقدم','جديد','الإعدادات'] },
+}[lang];
+document.documentElement.style.setProperty('--font', lang === 'ar' ? "'Plex Arabic'" : "'Jakarta'");
+document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+const m = document.getElementById('m');
+const ring = (pct) => `<svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="#F6E3DA" stroke-width="12"/><circle cx="48" cy="48" r="40" fill="none" stroke="#C2502E" stroke-width="12" stroke-linecap="round" stroke-dasharray="${2.513 * pct} 999" transform="rotate(-90 48 48)"/></svg>`;
+if (screen === 'today') {
+  m.innerHTML = `<div class="date">${T.date}</div><h1>${T.today}</h1>
+  <div class="ring">${ring(60)}<div><b>${T.done}</b><span>${T.keep}</span></div></div>
+  <div class="list">${T.habits.map(([i, t, s, on]) => `<div class="row"><div class="ico">${i}</div><div class="t"><b>${t}</b><span>${s}</span></div><div class="chk ${on ? 'on' : ''}"></div></div>`).join('')}</div>
+  <div class="streak"><div><b>🔥 ${T.streak}</b><span>${T.best}</span></div></div>`;
+} else if (screen === 'progress') {
+  const h = [60, 85, 70, 100, 90, 40, 75];
+  m.innerHTML = `<div class="date">${T.week}</div><h1>${T.progress}</h1>
+  <div class="bars"><b>${T.s1[0]}</b> <span style="color:var(--muted)">${T.s1[1]}</span><div class="g">${h.map((v, i) => `<div class="${i === 3 ? 'on' : ''}" style="height:${v}%"></div>`).join('')}</div><div class="x">${T.days.map((d) => `<span>${d}</span>`).join('')}</div></div>
+  <div class="stats">${[T.s2, T.s3, T.s4, T.s1].map(([a, b]) => `<div class="stat"><b>${a}</b><span>${b}</span></div>`).join('')}</div>`;
+} else {
+  m.innerHTML = `<div class="date">${T.pick}</div><h1>${T.add}</h1>
+  <div class="presets">${T.presets.map(([i, t, s], k) => `<div class="preset ${k === 1 ? 'on' : ''}"><div class="ico">${i}</div><b>${t}</b><span>${s}</span></div>`).join('')}</div>
+  <div class="btn">${T.cta}</div>`;
+}
+const on = { today: 0, progress: 1, add: 2 }[screen];
+document.getElementById('tabs').innerHTML = T.tabs.map((t, i) => `<div class="${i === on ? 'on' : ''}"><i></i>${t}</div>`).join('');
+</script>
+</body>
+</html>

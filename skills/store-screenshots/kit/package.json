@@ -1,0 +1,7 @@
+{
+  "name": "store-kit",
+  "private": true,
+  "type": "module",
+  "description": "Shared App Store / Play asset tooling. Deps here let agents run the kit with --root=<repo> without installing the app.",
+  "dependencies": { "googleapis": "^144.0.0", "playwright": "1.62.0", "sharp": "^0.34.0" }
+}

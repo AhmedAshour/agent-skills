@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+examples/*/app_store/screenshots/
+examples/*/app_store/raw/
+examples/demo-app/mock/captures/
+examples/*/app_store/screenshot-tool/lift.js
+examples/*/app_store/screenshot-tool/lift-debug.jpg
+.impeccable/

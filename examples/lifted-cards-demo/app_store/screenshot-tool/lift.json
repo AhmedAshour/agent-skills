@@ -1,0 +1,7 @@
+{
+  "src": "../../demo-app/mock/captures",
+  "sets": { "en": "en-US", "de": "de-DE", "ar": "ar-SA" },
+  "langSet": { "en": "en", "de": "de", "ar": "ar" },
+  "devGear": false,
+  "lift": { "today": [0], "progress": [0], "add": [] }
+}
