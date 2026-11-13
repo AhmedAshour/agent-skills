@@ -70,10 +70,15 @@ PATCH /v1/reviewSubmissions/{submissionId}
 
 ## First subscriptions / IAP with a version
 
-- `subscriptionSubmissions` fails with `FIRST_SUBSCRIPTION_MUST_BE_SUBMITTED_ON_VERSION`. What works: create the
-  reviewSubmission by API (step 1), then in ASC web open **each subscription and the subscription group** → "Add for
-  Review" → pick the draft submission. Then add the version item by API and submit. Without the group: 409 "must be
-  submitted with its subscription group version".
+- All by API: create the draft reviewSubmission (step 1), then `POST /v1/reviewSubmissionItems` once per item with
+  relationship `subscriptionGroupVersion` (id from `GET /v1/subscriptionGroups/{id}/versions`), `subscriptionVersion`
+  (id from `GET /v1/subscriptions/{id}/versions`) or `inAppPurchaseVersion` (`GET /v2/inAppPurchases/{id}/versions`),
+  then the `appStoreVersion` item, then `submitted: true`. Without the group: 409 "must be submitted with its
+  subscription group version".
+- Names/descriptions live on the version: `POST /v2/subscriptionLocalizations`, `/v2/subscriptionGroupLocalizations`,
+  `/v2/inAppPurchaseLocalizations` with relationship `version`. An APPROVED version is locked; `POST
+  /v1/subscriptionVersions` (etc.) makes a new one. The v1 localization, image and `*Submissions` endpoints are
+  deprecated and removed in early 2027.
 - Each subscription needs a review screenshot at an exact App Store size (e.g. 1242×2688, 1206×2622); wrong sizes go
   FAILED `IMAGE_INCORRECT_DIMENSIONS`. Wait for `assetDeliveryState.state == "COMPLETE"` (UPLOAD_COMPLETE isn't done).
 - Auto-renewable sub ⇒ Terms of Use (EULA) + Privacy links in **every** locale's description (3.1.2).
